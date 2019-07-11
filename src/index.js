@@ -6,12 +6,14 @@ const loaderUtils = require('loader-utils');
 const MIMES = {
   'jpg': 'image/jpeg',
   'jpeg': 'image/jpeg',
-  'png': 'image/png'
+  'png': 'image/png',
+  'webp': 'image/webp',
 };
 
 const EXTS = {
   'image/jpeg': 'jpg',
-  'image/png': 'png'
+  'image/png': 'png',
+  'image/webp': 'webp',
 };
 
 type Config = {
@@ -29,7 +31,7 @@ type Config = {
   background: string | number | void,
   placeholder: string | boolean | void,
   adapter: ?Function,
-  format: 'png' | 'jpg' | 'jpeg',
+  format: 'png' | 'jpg' | 'jpeg' | 'webp',
   disable: ?boolean,
 };
 
@@ -95,6 +97,9 @@ module.exports = function loader(content: Buffer) {
   const name = (config.name || '[hash]-[width].[ext]').replace(/\[ext\]/ig, ext);
 
   const adapter: Function = config.adapter || require('./adapters/jimp');
+  if (!config.adapter && (mime === MIMES['webp'])) {
+    return loaderCallback(new Error('JIMP does not support webp encoding, please use the sharp adapter.'));
+  }
   const loaderContext: any = this;
 
   // The config that is passed to the adatpers
@@ -134,7 +139,9 @@ module.exports = function loader(content: Buffer) {
 
     const {outputPath, publicPath} = getOutputAndPublicPath(fileName, config);
 
-    loaderContext.emitFile(outputPath, content);
+    if (typeof config.emitFile === 'undefined' || config.emitFile) {
+      loaderContext.emitFile(outputPath, content);
+    }
 
     return loaderCallback(null, 'module.exports = {srcSet:' + publicPath + ',images:[{path:' + publicPath + ',width:100,height:100}],src: ' + publicPath + ',toString:function(){return ' + publicPath + '}};');
   }
@@ -149,7 +156,9 @@ module.exports = function loader(content: Buffer) {
 
     const {outputPath, publicPath} = getOutputAndPublicPath(fileName, config);
 
-    loaderContext.emitFile(outputPath, data);
+    if (typeof config.emitFile === 'undefined' || config.emitFile) {
+      loaderContext.emitFile(outputPath, data);
+    }
 
     return {
       src: publicPath + `+${JSON.stringify(` ${width}w`)}`,
