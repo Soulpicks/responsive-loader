@@ -7,13 +7,13 @@ const MIMES = {
   'jpg': 'image/jpeg',
   'jpeg': 'image/jpeg',
   'png': 'image/png',
-  'webp': 'image/webp',
+  'webp': 'image/webp'
 };
 
 const EXTS = {
   'image/jpeg': 'jpg',
   'image/png': 'png',
-  'image/webp': 'webp',
+  'image/webp': 'webp'
 };
 
 type Config = {
@@ -97,7 +97,7 @@ module.exports = function loader(content: Buffer) {
   const name = (config.name || '[hash]-[width].[ext]').replace(/\[ext\]/ig, ext);
 
   const adapter: Function = config.adapter || require('./adapters/jimp');
-  if (!config.adapter && (mime === MIMES['webp'])) {
+  if (!config.adapter && (mime === MIMES.webp)) {
     return loaderCallback(new Error('JIMP does not support webp encoding, please use the sharp adapter.'));
   }
   const loaderContext: any = this;
