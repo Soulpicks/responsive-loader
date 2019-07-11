@@ -33,6 +33,7 @@ type Config = {
   adapter: ?Function,
   format: 'png' | 'jpg' | 'jpeg' | 'webp',
   disable: ?boolean,
+  emitFile: ?Boolean,
 };
 
 const getOutputAndPublicPath = (fileName:string, {outputPath: configOutputPath, publicPath: configPublicPath}:Config) => {
